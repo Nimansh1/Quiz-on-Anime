@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Roblox Style Quiz Game</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bungee+Shade&display=swap');
+
+  body {
+    background: linear-gradient(135deg, #3f87a6, #ebf8e1);
+    font-family: 'Bungee Shade', cursive, Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    color: #222;
+  }
+
+  h1 {
+    font-size: 5rem;
+    color: #ff3c00;
+    text-shadow:
+       3px 3px 0 #000,
+       6px 6px 0 #ff8a00,
+       9px 9px 0 #ff3c00;
+    margin-bottom: 10px;
+    user-select: none;
+  }
+
+  #scoreboard {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: #ff8a00;
+    text-shadow: 2px 2px 0 #000;
+  }
+
+  #question {
+    font-size: 2rem;
+    margin: 20px 0;
+    text-align: center;
+    text-shadow: 1.5px 1.5px 0 #000;
+    max-width: 600px;
+  }
+
+  .answers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+    width: 100%;
+    max-width: 650px;
+  }
+
+  button.answer-btn {
+    background: linear-gradient(145deg, #ff3c00, #ff8a00);
+    border: none;
+    border-radius: 12px;
+    padding: 15px 20px;
+    font-size: 1.4rem;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow:
+      3px 3px 5px #b74b00,
+      inset 0 2px 2px rgba(255, 255, 255, 0.3);
+    text-shadow: 2px 2px 4px #000;
+    transition: background 0.3s, transform 0.1s;
+    user-select: none;
+  }
+
+  button.answer-btn:hover:not(:disabled) {
+    background: linear-gradient(145deg, #ff8a00, #ff3c00);
+    transform: translateY(-3px);
+  }
+
+  button.answer-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  #next-btn {
+    margin-top: 25px;
+    background: #00c853;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.8rem;
+    color: white;
+    border-radius: 14px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px #00701a;
+    user-select: none;
+    display: none;
+    text-shadow: 1.5px 1.5px 3px #004d00;
+    transition: background 0.3s;
+  }
+
+  #next-btn:hover {
+    background: #00701a;
+  }
+
+  #result {
+    font-size: 3rem;
+    margin-top: 30px;
+    color: #ff3c00;
+    text-shadow:
+       3px 3px 0 #000,
+       6px 6px 0 #ff8a00;
+    user-select: none;
+  }
+</style>
+</head>
+<body>
+  <h1>ROBLOX QUIZ</h1>
+  <div id="scoreboard">Score: 0</div>
+  <div id="question"></div>
+  <div class="answers" id="answers"></div>
+  <button id="next-btn">Next Question</button>
+  <div id="result"></div>
+
+  <script>
+    const quizData = [
+      {
+        question: "Who is known as the 'Electric Mouse' in the anime world?",
+        options: ["Naruto", "Pikachu", "Goku", "Luffy"],
+        answer: "Pikachu"
+      },
+      {
+        question: "Which character uses the Kamehameha wave?",
+        options: ["Naruto", "Goku", "Luffy", "Greninja"],
+        answer: "Goku"
+      },
+      {
+        question: "Which character is from the anime 'One Piece'?",
+        options: ["Naruto", "Luffy", "Pikachu", "Goku"],
+        answer: "Luffy"
+      },
+      {
+        question: "Who is a ninja in the quiz characters?",
+        options: ["Greninja", "Naruto", "Pikachu", "Luffy"],
+        answer: "Naruto"
+      },
+      {
+        question: "Which character is a water/dark-type Pokémon?",
+        options: ["Luffy", "Naruto", "Greninja", "Goku"],
+        answer: "Greninja"
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    const questionEl = document.getElementById('question');
+    const answersEl = document.getElementById('answers');
+    const nextBtn = document.getElementById('next-btn');
+    const scoreboardEl = document.getElementById('scoreboard');
+    const resultEl = document.getElementById('result');
+
+    function loadQuestion() {
+      resultEl.textContent = "";
+      nextBtn.style.display = 'none';
+      questionEl.textContent = quizData[currentQuestion].question;
+      answersEl.innerHTML = '';
+
+      quizData[currentQuestion].options.forEach(option => {
+        const btn = document.createElement('button');
+        btn.className = 'answer-btn';
+        btn.textContent = option;
+        btn.onclick = () => selectAnswer(btn, option);
+        answersEl.appendChild(btn);
+      });
+    }
+
+    function selectAnswer(button, selected) {
+      // Disable all buttons
+      Array.from(answersEl.children).forEach(btn => btn.disabled = true);
+
+      const correct = quizData[currentQuestion].answer;
+      if (selected === correct) {
+        button.style.background = "#00c853";
+        score++;
+        scoreboardEl.textContent = `Score: ${score}`;
+      } else {
+        button.style.background = "#d50000";
+        // Highlight correct answer
+        Array.from(answersEl.children).forEach(btn => {
+          if (btn.textContent === correct) {
+            btn.style.background = "#00c853";
+          }
+        });
+      }
+
+      nextBtn.style.display = 'inline-block';
+    }
+
+    nextBtn.onclick = () => {
+      currentQuestion++;
+      if (currentQuestion < quizData.length) {
+        loadQuestion();
+      } else {
+        showResult();
+      }
+    };
+
+    function showResult() {
+      questionEl.textContent = "";
+      answersEl.innerHTML = "";
+      nextBtn.style.display = "none";
+      resultEl.textContent = `You scored ${score} / ${quizData.length}!`;
+    }
+
+    loadQuestion();
+  </script>
+</body>
+</html>
